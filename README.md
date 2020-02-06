@@ -1,4 +1,6 @@
 module_msfrpcd
-===========
+==============
 
-FruityWifi Msfrpcd module
+FruityWiFi msfrpcd module
+
+https://github.com/rapid7/metasploit-framework
