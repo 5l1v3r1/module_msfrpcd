@@ -1,6 +1,6 @@
 <? 
 /*
-    Copyright (C) 2013-2014 xtr4nge [_AT_] gmail.com
+    Copyright (C) 2013-2020 xtr4nge [_AT_] gmail.com
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,43 +36,65 @@ $action = $_GET['action'];
 $page = $_GET['page'];
 $install = $_GET['install'];
 
+
 if($service != "") {
     
     if ($action == "start") {
         
         // COPY LOG
-        if ( 0 < filesize( $mod_logs ) ) {
+        if ( 0 < filesize($mod_logs)) {
             $exec = "$bin_cp $mod_logs $mod_logs_history/".gmdate("Ymd-H-i-s").".log";
-            //exec("$bin_danger \"$exec\"" ); //DEPRECATED
             exec_fruitywifi($exec);
             
             $exec = "$bin_echo '' > $mod_logs";
-            //exec("$bin_danger \"$exec\"" ); //DEPRECATED
             exec_fruitywifi($exec);
         }
-			
-		$exec = "$bin_php meterpreter.php > /dev/null &";
-        //exec($exec);
-		//exec("$bin_danger \"$exec\"" );
-        exec_fruitywifi($exec);
+
+	//START MODULE
+		if($msfrpcd_sslenable == "false"){
+		 if($msfrpcd_db == "false"){
+			$exec = "msfrpcd -a $msfrpcd_host -p $msfrpcd_port -U $msfrpcd_user -P $msfrpcd_pw  -n -S -f > $mod_logs &";
+                	 exec_fruitywifi($exec);
+			}else{
+            		$exec = "msfrpcd -a $msfrpcd_host -p $msfrpcd_port -U $msfrpcd_user -P $msfrpcd_pw -S -f > $mod_logs &";
+                	 exec_fruitywifi($exec);
+			}
+   	}else if($msfrpcd_sslenable == "true"){
+            if($msfrpcd_db == "false"){
+                if($msfrpcd_sslverify == "false"){
+                     $exec = "msfrpcd -j -a $msfrpcd_host -p $msfrpcd_port -U $msfrpcd_user -P $msfrpcd_pw -c $msfrpcd_sslcertpath -k $msfrpcd_sslprivkeypath -n -f > $mod_logs &";
+                	 exec_fruitywifi($exec);
+                     }else{
+                     $exec = "msfrpcd -j -a $msfrpcd_host -p $msfrpcd_port -U $msfrpcd_user -P $msfrpcd_pw -c $msfrpcd_sslcertpath -k $msfrpcd_sslprivkeypath -v -n -f > $mod_logs &";
+                	 exec_fruitywifi($exec);
+                     }
+            }else{
+              if($msfrpcd_sslverify == "false"){
+                     $exec = "msfrpcd -j -a $msfrpcd_host -p $msfrpcd_port -U $msfrpcd_user -P $msfrpcd_pw -c $msfrpcd_sslcertpath -k $msfrpcd_sslprivkeypath -f > $mod_logs &";
+                	 exec_fruitywifi($exec);
+                     }else{
+                     $exec = "msfrpcd -j -a $msfrpcd_host -p $msfrpcd_port -U $msfrpcd_user -P $msfrpcd_pw -c $msfrpcd_sslcertpath -k $msfrpcd_sslprivkeypath -v -f > $mod_logs &";
+                	 exec_fruitywifi($exec);
+                     } 
+            	}
+		}else{
+		header('Location: ../../action.php?page='.$mod_name);
+		}
+		
+		
+		
 		
     } else if($action == "stop") {
         // STOP MODULE
-		$exec = "ps aux|grep 'meterpreter\.php'|awk '{print $2}'";
-		exec($exec, $output);
-        //$exec = "$bin_killall $mod_name";
-		$exec = "$bin_kill " . $output[0];
-        //exec("$bin_danger \"$exec\"" ); //DEPRECATED
-        exec_fruitywifi($exec);
+       		$exec = "pgrep -f $mod_name | xargs kill -9";
+        	exec_fruitywifi($exec);
         
         // COPY LOG
         if ( 0 < filesize( $mod_logs ) ) {
             $exec = "$bin_cp $mod_logs $mod_logs_history/".gmdate("Ymd-H-i-s").".log";
-            //exec("$bin_danger \"$exec\"" ); //DEPRECATED
             exec_fruitywifi($exec);
             
             $exec = "$bin_echo '' > $mod_logs";
-            //exec("$bin_danger \"$exec\"" ); //DEPRECATED
             exec_fruitywifi($exec);
         }
 
@@ -83,11 +105,9 @@ if($service != "") {
 if ($install == "install_$mod_name") {
 
     $exec = "chmod 755 install.sh";
-    //exec("$bin_danger \"$exec\"" ); //DEPRECATED
     exec_fruitywifi($exec);
 
     $exec = "$bin_sudo ./install.sh > $log_path/install.txt &";
-    //exec("$bin_danger \"$exec\"" ); //DEPRECATED
     exec_fruitywifi($exec);
 
     header('Location: ../../install.php?module='.$mod_name);
