@@ -1,7 +1,18 @@
 #!/bin/bash
+echo
+echo "installing msfconsole..."
+echo
 
-echo "installing autossh..."
-apt-get -y install autossh
+curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb > msfinstall && chmod 755 msfinstall && ./msfinstall
+
+
+echo 
+echo "Cleaning Up..."
+echo
+
+rm msfinstall
 
 echo "..DONE.."
 exit
+
+
