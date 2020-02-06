@@ -1,4 +1,4 @@
-module_meterpreter
+module_msfrpcd
 ===========
 
-FruityWifi Meterpreter module
+FruityWifi Msfrpcd module
